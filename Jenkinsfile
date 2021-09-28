@@ -5,7 +5,7 @@ pipeline{
 			steps{
 				echo 'This Is the Build Steps';
 				sh 'cd /root/myapps-training';
-				sh 'jar -cvf dist/myapps.war src/index.html';
+				sh 'jar -cvf dist/myapps.war index.html';
 				milestone(2)
 				archiveArtifacts artifacts: 'dist/myapps.war';
 				}
