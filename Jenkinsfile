@@ -4,13 +4,44 @@ pipeline{
 		stage('BUILD'){
 			steps{
 				echo 'This Is the Build Steps';
-				sh 'ls -l';
+				sh 'cd /root/myapps-training';
+				sh 'jar -cvf dist/myapps.war src/index.html';
+				archiveArtifacts artifacts: 'dist/myapps.war';
 				}
 			}
 		stage('DEPLOY'){
 			steps{
-				echo 'This is the deploy step';
-			}
+			
+				withCredentials([usernamePassword(credentialsId: 'deploy', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+
+	sshPublisher(
+
+			failOnError: true,
+			continueOnError: false,
+			publisher: [
+				sshPublisherDesc(
+
+					configName: 'qual',
+					sshCredentials: [
+						username: "$USERNAME",
+						encryptedPassphrase: "$USERPASS"
+				
+							],
+							transfers: [
+								sshTransfer(
+									sourceFiles: 'dist/myapps.war',
+									removePrefix: 'dist/',
+									remoteDirectory: '/tmp',
+									execCommand: '/usr/share/apache-tomcat-9.0.48/bin/shutdown.sh & cp /tmp/myapps.war /usr/share/apache-tomcat-9.0.48/webapps/ & /usr/share/apache-tomcat-9.0.48/bin/startup.sh'
+									)
+								]
+						)
+					]				
+
+			)
+	}
+	
+				}
 				}
 
 		}
