@@ -18,7 +18,7 @@ pipeline{
 
 			failOnError: true,
 			continueOnError: false,
-			publisher: [
+			publishers: [
 				sshPublisherDesc(
 
 					configName: 'qual',
